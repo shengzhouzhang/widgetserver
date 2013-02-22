@@ -28,26 +28,30 @@ public class WidgetDao {
 	 * @param widget_name	the name of the widget.
 	 * 
 	 */
-	public void Create(WidgetBean widget) throws ClassNotFoundException, SQLException {
+	public WidgetBean Create(WidgetBean widget) throws ClassNotFoundException, SQLException {
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		WidgetBean item = null;
 		
 		try{
 			
 			conn = Connector.getConnction();
-			String sql ="SELECT * FROM create_widget(?,?,?,?,?,?,?,?,?);";
+			String sql ="SELECT * FROM create_widget(?,?,?);";
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, widget.getCreatorName());
-			pstmt.setString(2, widget.getWidgetName());
-			pstmt.setBoolean(3, widget.getDependencies().isJquery());
-			pstmt.setBoolean(4, widget.getDependencies().isBootstrap());
-			pstmt.setBoolean(5, widget.getDependencies().isFacebook());
-			pstmt.setBoolean(6, widget.getDependencies().isLinkedin());
-			pstmt.setBoolean(7, widget.getDependencies().isTwitter());
-			pstmt.setBoolean(8, widget.getDependencies().isGooglemap());
-			pstmt.setBoolean(9, widget.getDependencies().isGoogleplus());
-			pstmt.execute();
+			pstmt.setString(1, widget.getCreator_name());
+			pstmt.setString(2, widget.getWidget_name());
+			pstmt.setString(3, widget.getService_name());
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()){
+				item = new WidgetBean();
+				item.setId(rs.getInt("wid"));
+				item.setCreator_name(rs.getString("username"));
+				item.setWidget_name(rs.getString("widget_name"));
+				item.setService_name(rs.getString("service_name"));
+			}
 			
 		}catch(SQLException e){
 			throw e;
@@ -59,6 +63,8 @@ public class WidgetDao {
 				pstmt.close();
 			}
 		}
+		
+		return item;
 	}
 	
 	/*
@@ -87,16 +93,9 @@ public class WidgetDao {
 			if(rs.next()){
 				item = new WidgetBean();
 				item.setId(rs.getInt("wid"));
-				item.setCreatorName(rs.getString("username"));
-				item.setWidgetName(rs.getString("widget_name"));
-				item.setDependencies(new Dependencies());
-				item.getDependencies().setJquery(rs.getBoolean("jquery"));
-				item.getDependencies().setBootstrap(rs.getBoolean("bootstrap"));
-				item.getDependencies().setFacebook(rs.getBoolean("facebook"));
-				item.getDependencies().setLinkedin(rs.getBoolean("linkedin"));
-				item.getDependencies().setTwitter(rs.getBoolean("twitter"));
-				item.getDependencies().setGooglemap(rs.getBoolean("googlemap"));
-				item.getDependencies().setGoogleplus(rs.getBoolean("googleplus"));
+				item.setCreator_name(rs.getString("username"));
+				item.setWidget_name(rs.getString("widget_name"));
+				item.setService_name(rs.getString("service_name"));
 			}else{
 				System.out.println(creator_name);
 				System.out.println(widget_name);
@@ -120,7 +119,7 @@ public class WidgetDao {
 	 * 
 	 * @return				a list of java beans.
 	 */
-	public List<WidgetBean> List() throws ClassNotFoundException, SQLException{
+	public List<WidgetBean> List(String service) throws ClassNotFoundException, SQLException{
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -130,20 +129,20 @@ public class WidgetDao {
 		try{
 			
 			conn = Connector.getConnction();
-			String sql ="Select * from list_widgets();";
+			String sql ="Select * from list_widgets(?);";
 			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, service);
 			rs = pstmt.executeQuery();
 			
 			while(rs.next()){
 				WidgetBean item = new WidgetBean();
 				item.setId(rs.getInt("wid"));
-				item.setCreatorName(rs.getString("creator"));
-				item.setWidgetName(rs.getString("widget_name"));
+				item.setCreator_name(rs.getString("creator"));
+				item.setWidget_name(rs.getString("widget_name"));
 				items.add(item);
 			}
 			
 		}catch(SQLException e){
-			conn.rollback();
 			throw e;
 		}catch(ClassNotFoundException e){
 			throw e;
@@ -172,17 +171,11 @@ public class WidgetDao {
 		try{
 			
 			conn = Connector.getConnction();
-			String sql ="select * from update_widget(?,?,?,?,?,?,?,?,?);";
+			String sql ="select * from update_widget(?,?,?);";
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, widget.getCreatorName());
-			pstmt.setString(2, widget.getWidgetName());
-			pstmt.setBoolean(3, widget.getDependencies().isJquery());
-			pstmt.setBoolean(4, widget.getDependencies().isBootstrap());
-			pstmt.setBoolean(5, widget.getDependencies().isFacebook());
-			pstmt.setBoolean(6, widget.getDependencies().isLinkedin());
-			pstmt.setBoolean(7, widget.getDependencies().isTwitter());
-			pstmt.setBoolean(8, widget.getDependencies().isGooglemap());
-			pstmt.setBoolean(9, widget.getDependencies().isGoogleplus());
+			pstmt.setString(1, widget.getCreator_name());
+			pstmt.setString(2, widget.getWidget_name());
+			pstmt.setString(3, widget.getService_name());
 			pstmt.execute();
 			
 		}catch(SQLException e){

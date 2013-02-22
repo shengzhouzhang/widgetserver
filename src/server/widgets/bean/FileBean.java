@@ -1,11 +1,9 @@
 package server.widgets.bean;
 
-import java.util.List;
-
 public class FileBean {
 
 	private String javascript;
-	private List<String> templates;
+	private String html;
 	private String css;
 	private String container;
 	
@@ -15,11 +13,11 @@ public class FileBean {
 	public void setJavascript(String javascript) {
 		this.javascript = javascript;
 	}
-	public List<String> getTemplates() {
-		return templates;
+	public String getHtml() {
+		return html;
 	}
-	public void setTemplates(List<String> templates) {
-		this.templates = templates;
+	public void setHtml(String html) {
+		this.html = html;
 	}
 	public String getCss() {
 		return css;

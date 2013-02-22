@@ -8,7 +8,7 @@ public class WidgetBean {
 	
 	private FileBean files;
 	
-	private Dependencies dependencies;
+	private String service_name;
 	
 	public WidgetBean(){
 	}
@@ -27,19 +27,19 @@ public class WidgetBean {
 		this.id = id;
 	}
 
-	public String getCreatorName() {
+	public String getCreator_name() {
 		return creator_name;
 	}
 
-	public void setCreatorName(String creator_name) {
+	public void setCreator_name(String creator_name) {
 		this.creator_name = creator_name;
 	}
 
-	public String getWidgetName() {
+	public String getWidget_name() {
 		return widget_name;
 	}
 
-	public void setWidgetName(String widget_name) {
+	public void setWidget_name(String widget_name) {
 		this.widget_name = widget_name;
 	}
 
@@ -51,14 +51,14 @@ public class WidgetBean {
 		this.files = files;
 	}
 
-	public Dependencies getDependencies() {
-		return dependencies;
+	public String getService_name() {
+		return service_name;
 	}
 
-	public void setDependencies(Dependencies dependencies) {
-		this.dependencies = dependencies;
+	public void setService_name(String service_name) {
+		this.service_name = service_name;
 	}
-	
-	
+
+
 
 }

@@ -11,7 +11,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.google.gson.Gson;
@@ -36,37 +35,39 @@ public class WidgetServer {
 		Response response = null;
 		WidgetDao dao = null;
 		GitAPI api = null;
+		WidgetBean send = null;
 
 		try {
 			
 			String email = "";
 			
-			Gson gson = new Gson();
-			
 			WidgetBean widgetBean = new WidgetBean();
 			
-			widgetBean.setCreatorName(gson.fromJson(widget.getString("creator_name"), String.class));
-			widgetBean.setWidgetName(gson.fromJson(widget.getString("widget_name"), String.class));
-//			widgetBean.setFiles(gson.fromJson(widget.getString("files"), FileBean.class));
-			widgetBean.setDependencies(gson.fromJson(widget.getString("dependencies"), Dependencies.class));
+			widgetBean.setCreator_name(widget.getString("creator_name"));
+			widgetBean.setWidget_name(widget.getString("widget_name"));
+			widgetBean.setService_name(widget.getString("service_name"));
 			
-			String folder = widgetBean.getCreatorName() + "/" + widgetBean.getWidgetName();
+			String folder = widgetBean.getCreator_name() + "/" + widgetBean.getWidget_name();
 			
 			dao = new WidgetDao();
 			
-			dao.Create(widgetBean);
+			send = dao.Create(widgetBean);
 			
 			api = new JGitAgency();
 			
 			api.init_repository(folder);
 			
-			System.out.println(widget.getString("files"));
 			
-			api.commit(widgetBean.getCreatorName(), email, widget.getString("files"), "Initial Commit");
+			api.commit(widgetBean.getCreator_name(), email, widget.getString("files"), "Initial Commit");
 			
 			api.close_repository();
 			
-			response = Response.ok("Created").build();
+			Gson gson = new Gson();
+			FileBean files = gson.fromJson(widget.getString("files"), FileBean.class);
+			
+			send.setFiles(files);
+			
+			response = Response.ok(gson.toJson(send)).build();
 		
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -80,10 +81,14 @@ public class WidgetServer {
 	 * Obtain a list of widget's name
 	 */
 	@GET
+	@Path("{service_name}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response List() {
+	public Response List(
+			@PathParam("service_name") String service_name
+			) {
 		
 		System.out.println("Listing");
+
 		Response response = null;
 		WidgetDao dao = null;
 		List<WidgetBean> widgetList = null;
@@ -92,17 +97,13 @@ public class WidgetServer {
 			
 			dao = new WidgetDao();
 			
-			widgetList = dao.List();
-			JSONArray ja = new JSONArray();
+			widgetList = dao.List(service_name);
 			
-			for (int i = 0; i < widgetList.size(); i++) {
-				JSONObject jo = new JSONObject();
-				jo.put("id", widgetList.get(i).getId());
-				jo.put("creator_name", widgetList.get(i).getCreatorName());
-				jo.put("widget_name",  widgetList.get(i).getWidgetName());
-				ja.put(jo);
-			}
-			response = Response.ok(ja.toString()).build();
+			Gson gson = new Gson();
+			
+			String json = gson.toJson(widgetList);  
+			
+			response = Response.ok(json).build();
 		
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -141,16 +142,12 @@ public class WidgetServer {
 			api.open_repository(folder);
 			String json_file = api.readLatest();
 			
-			System.out.println(json_file);
-			
 			api.close_repository();
 			
 			Gson gson = new Gson();
 			FileBean files = gson.fromJson(json_file, FileBean.class);
 			
 			widget.setFiles(files);
-			
-			System.out.println(gson.toJson(widget));
 			
 			response = Response.ok(gson.toJson(widget)).build();
 		
@@ -197,7 +194,7 @@ public class WidgetServer {
 				file = files.getJavascript();
 				response = Response.ok(file, "application/x-javascript").build();
 			}else if(file_name.equals("template.html")){
-				file = files.getTemplates().get(0);
+				file = files.getHtml();
 				response = Response.ok(file, MediaType.TEXT_HTML).build();
 			}else if(file_name.equals("style.css")){
 				file = files.getCss();
@@ -218,7 +215,7 @@ public class WidgetServer {
 	}
 	
 	/*
-	 * Obtain a file of the widget
+	 * Preview
 	 */
 	@GET
 	@Path("{creator_name}/{widget_name}/preview")
@@ -231,20 +228,10 @@ public class WidgetServer {
 		System.out.println("preview");
 		
 		Response response = null;
-//		GitAPI api = null;
 		
 		try {
 			
-//			api = new JGitAgency();
-			
 			String path = creator_name + "/" + widget_name;
-			
-//			api.open_repository(folder);
-//			String json_file = api.readLatest();
-//			api.close_repository();
-//			
-//			Gson gson = new Gson();
-//			FileBean files = gson.fromJson(json_file, FileBean.class);
 
 			
 			StringBuffer stream = new StringBuffer();
@@ -254,38 +241,24 @@ public class WidgetServer {
 			stream.append("<head>\n");
 			stream.append("<title>Preview</title>\n");
 			//append css
-			stream.append(add_link_resource("http://twitter.github.com/bootstrap/assets/css/bootstrap.css"));
-			stream.append(add_link_resource("http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css"));
-			stream.append(add_link_resource("http://localhost:8080/widgetserver/widgets/" + path + "/style.css"));
+			stream.append(add_link_resource("http://localhost:8080/widgets/app/resources/bootstrap/css/bootstrap.min.css"));
+			stream.append(add_link_resource("http://localhost:8080/widgets/app/resources/bootstrap/css/bootstrap-responsive.min.css"));
+			stream.append("<style type=\"text/css\">body{padding:10px;margin:10px;border:1px solid #ccc;}</style>");
+			
+			stream.append(add_script_resource("http://localhost:8080/widgets/app/resources/jquery.js"));
+			stream.append(add_script_resource("http://localhost:8080/widgets/app/resources/underscore-min.js"));
+			stream.append(add_script_resource("http://localhost:8080/widgets/app/resources/backbone-min.js"));
+			stream.append(add_script_resource("http://localhost:8080/widgets/app/resources/application.js"));
 			stream.append("</head>\n");
 			stream.append("<body>\n");
 			stream.append("<div id=\"example-widget-container\"></div>\n");
-			
+			stream.append("<script>\n");
+			stream.append("$(document).ready(function(){application.debugger.run(\"" + path + "\");});\n");
+			stream.append("</script>\n");
 			//append js
-			stream.append(add_script_resource("http://localhost:8080/widget-backbone-boilerplate/widgetapp/resources/jquery/jquery-1.8.3.js"));
-			stream.append(add_script_resource("http://localhost:8080/widget-backbone-boilerplate/widgetapp/resources/underscore/underscore.js"));
-			stream.append(add_script_resource("http://localhost:8080/widget-backbone-boilerplate/widgetapp/resources/backbone/backbone.js"));
-			stream.append(add_script_resource("http://localhost:8080/widget-backbone-boilerplate/widgetapp/resources/application.js"));
-			stream.append(add_script_resource("http://localhost:8080/widgetserver/widgets/" + path + "/widget.js"));
-			stream.append(add_script_resource("http://localhost:8080/widgetserver/widgets/" + path + "/run.js"));
 			
 			stream.append("</body>\n");
 			stream.append("</html>\n");
-//			if(file_name.equals("js")){
-//				file = files.getJavascript();
-//				response = Response.ok(file, "application/x-javascript").build();
-//			}else if(file_name.equals("templates")){
-//				file = gson.toJson(files.getTemplates());
-//				response = Response.ok(file, MediaType.APPLICATION_JSON).build();
-//			}else if(file_name.equals("css")){
-//				file = files.getCss();
-//				response = Response.ok(file, "text/css").build();
-//			}else if(file_name.equals("container")){
-//				file = files.getContainer();
-//				response = Response.ok(file, "application/x-javascript").build();
-//			}else{
-//				throw new Exception("NOT FOUND: " + file_name);
-//			}
 			
 			response = Response.ok(stream.toString()).build();
 		
@@ -341,23 +314,22 @@ public class WidgetServer {
 			dao = new WidgetDao();
 			api = new JGitAgency();
 			
-			Gson gson = new Gson();
-			
 			WidgetBean widgetBean = new WidgetBean();
 			
-			widgetBean.setCreatorName(gson.fromJson(widget.getString("creator_name"), String.class));
-			widgetBean.setWidgetName(gson.fromJson(widget.getString("widget_name"), String.class));
-			widgetBean.setDependencies(gson.fromJson(widget.getString("dependencies"), Dependencies.class));
+			widgetBean.setCreator_name(widget.getString("creator_name"));
+			widgetBean.setWidget_name(widget.getString("widget_name"));
+			widgetBean.setService_name(widget.getString("service_name"));
 			
 			dao.Update(widgetBean);
 			
-			String folder = widgetBean.getCreatorName() + "/" + widgetBean.getWidgetName();
+			String folder = widgetBean.getCreator_name() + "/" + widgetBean.getWidget_name();
 			
 			api.open_repository(folder);
+
 			api.commit(creator_name, "", widget.getString("files"), "Update Commit");
 			api.close_repository();
 			
-			response = Response.ok("Updated").build();
+			response = Response.ok().build();
 		
 		} catch (Exception e) {
 			e.printStackTrace();
