@@ -43,9 +43,15 @@ public class WidgetServer {
 			
 			WidgetBean widgetBean = new WidgetBean();
 			
+			Gson gson = new Gson();
+			
 			widgetBean.setCreator_name(widget.getString("creator_name"));
 			widgetBean.setWidget_name(widget.getString("widget_name"));
 			widgetBean.setService_name(widget.getString("service_name"));
+			
+			ConfigurationBean config = gson.fromJson(widget.getString("configurations"), ConfigurationBean.class);
+			
+			widgetBean.setConfiguration(config);			
 			
 			String folder = widgetBean.getCreator_name() + "/" + widgetBean.getWidget_name();
 			
@@ -62,10 +68,12 @@ public class WidgetServer {
 			
 			api.close_repository();
 			
-			Gson gson = new Gson();
-			FileBean files = gson.fromJson(widget.getString("files"), FileBean.class);
 			
-			send.setFiles(files);
+//			FileBean files = gson.fromJson(widget.getString("files"), FileBean.class);
+//			
+//			send.setFiles(files);
+			
+			System.out.println(gson.toJson(send));
 			
 			response = Response.ok(gson.toJson(send)).build();
 		
@@ -313,12 +321,16 @@ public class WidgetServer {
 			
 			dao = new WidgetDao();
 			api = new JGitAgency();
+			Gson gson = new Gson();
 			
 			WidgetBean widgetBean = new WidgetBean();
 			
 			widgetBean.setCreator_name(widget.getString("creator_name"));
 			widgetBean.setWidget_name(widget.getString("widget_name"));
 			widgetBean.setService_name(widget.getString("service_name"));
+			
+			ConfigurationBean config = gson.fromJson(widget.getString("configurations"), ConfigurationBean.class);
+			widgetBean.setConfiguration(config);
 			
 			dao.Update(widgetBean);
 			
@@ -329,7 +341,7 @@ public class WidgetServer {
 			api.commit(creator_name, "", widget.getString("files"), "Update Commit");
 			api.close_repository();
 			
-			response = Response.ok().build();
+			response = Response.ok(widget.toString()).build();
 		
 		} catch (Exception e) {
 			e.printStackTrace();

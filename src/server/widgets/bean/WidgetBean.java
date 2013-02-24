@@ -10,6 +10,8 @@ public class WidgetBean {
 	
 	private String service_name;
 	
+	private ConfigurationBean configurations;
+
 	public WidgetBean(){
 	}
 
@@ -59,6 +61,12 @@ public class WidgetBean {
 		this.service_name = service_name;
 	}
 
+	public ConfigurationBean getConfiguration() {
+		return configurations;
+	}
 
+	public void setConfiguration(ConfigurationBean configuration) {
+		this.configurations = configuration;
+	}
 
 }
