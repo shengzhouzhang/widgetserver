@@ -20,11 +20,22 @@ import server.widgets.dao.*;
 import unsw.manager.code.interfaces.*;
 import unsw.manager.code.manager.*;
 
+/** 
+ *  This is the class for rest service.
+ *
+ * @author Steven Zhang
+ * @version 1.0 February 24, 2013.
+ */
 @Path("/widgets")
 public class WidgetServer {
 
-	/*
+	/**
 	 * Create a widget
+	 * <p>
+	 * /widgets/	POST
+	 * 
+	 * @param widget a JSON string of widget
+	 * @return a JSON string of widget with id in database.
 	 */
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
@@ -68,11 +79,6 @@ public class WidgetServer {
 			
 			api.close_repository();
 			
-			
-//			FileBean files = gson.fromJson(widget.getString("files"), FileBean.class);
-//			
-//			send.setFiles(files);
-			
 			System.out.println(gson.toJson(send));
 			
 			response = Response.ok(gson.toJson(send)).build();
@@ -85,8 +91,13 @@ public class WidgetServer {
 		return response;
 	}
 	
-	/*
-	 * Obtain a list of widget's name
+	/**
+	 * List widgets in a service
+	 * <p>
+	 * /widgets/:serviceName/	GET
+	 * 
+	 * @param service_name a string of service name
+	 * @return the JSON list of widgets in the service
 	 */
 	@GET
 	@Path("{service_name}")
@@ -121,8 +132,15 @@ public class WidgetServer {
 		return response;
 	}
 	
-	/*
-	 * Obtain all detail of a widget
+	/**
+	 * Find a widget by names
+	 * <p>
+	 * /widgets/:creatorName/:widgetName	GET
+	 * 
+	 * @param creator_name the string of creator name
+	 * @param widget_name the string of widget name
+	 * 
+	 * @return the JSON string of the widget
 	 */
 	@GET
 	@Path("{creator_name}/{widget_name}")
@@ -167,9 +185,20 @@ public class WidgetServer {
 		return response;
 	}
 	
-	
-	/*
-	 * Obtain a file of the widget
+
+	/**
+	 * Obtain a file of widget
+	 * <p>
+	 * /widgets/:creatorName/:widgetName/:fileName	GET
+	 * 
+	 * File Name Attribute: widget.js, template.html, style.css, and container.js
+	 * 
+	 * @param creator_name the string of creator name
+	 * @param widget_name the string of widget name
+	 * @param file_name the string of file name
+	 * 
+	 * @return the string of the file content
+	 * 
 	 */
 	@GET
 	@Path("{creator_name}/{widget_name}/{file_name}")
@@ -222,8 +251,16 @@ public class WidgetServer {
 		return response;
 	}
 	
-	/*
-	 * Preview
+	/**
+	 * Obtain a HTML code of Preview
+	 * <p>
+	 * /widgets/:creatorName/:widgetName/preview	GET
+	 * 
+	 * @param creator_name the string of creator name
+	 * @param widget_name the string of widget name
+	 * 
+	 * @return HTML code of preview
+	 * 
 	 */
 	@GET
 	@Path("{creator_name}/{widget_name}/preview")
@@ -249,19 +286,18 @@ public class WidgetServer {
 			stream.append("<head>\n");
 			stream.append("<title>Preview</title>\n");
 			//append css
-			stream.append(add_link_resource("http://localhost:8080/widgets/app/resources/bootstrap/css/bootstrap.min.css"));
-			stream.append(add_link_resource("http://localhost:8080/widgets/app/resources/bootstrap/css/bootstrap-responsive.min.css"));
-			stream.append("<style type=\"text/css\">body{padding:10px;margin:10px;border:1px solid #ccc;}</style>");
-			
-			stream.append(add_script_resource("http://localhost:8080/widgets/app/resources/jquery.js"));
-			stream.append(add_script_resource("http://localhost:8080/widgets/app/resources/underscore-min.js"));
-			stream.append(add_script_resource("http://localhost:8080/widgets/app/resources/backbone-min.js"));
-			stream.append(add_script_resource("http://localhost:8080/widgets/app/resources/application.js"));
+			stream.append(add_link_resource("http://localhost:8080/widgeteditor/resources/bootstrap/css/bootstrap.min.css"));
+			stream.append(add_link_resource("http://localhost:8080/widgeteditor/resources/bootstrap/css/bootstrap-responsive.min.css"));
+			stream.append(add_script_resource("http://localhost:8080/widgeteditor/resources/jquery.js"));
+			stream.append(add_script_resource("http://localhost:8080/widgeteditor/resources/underscore-min.js"));
+			stream.append(add_script_resource("http://localhost:8080/widgeteditor/resources/backbone-min.js"));
+			stream.append(add_script_resource("http://localhost:8080/widgeteditor/resources/application.js"));
+			stream.append(add_script_resource("http://localhost:8080/widgetserver/widgets/" + path + "/widget.js"));
+			stream.append(add_script_resource("http://localhost:8080/widgetserver/widgets/" + path + "/run.js"));
 			stream.append("</head>\n");
 			stream.append("<body>\n");
 			stream.append("<div id=\"example-widget-container\"></div>\n");
 			stream.append("<script>\n");
-			stream.append("$(document).ready(function(){application.debugger.run(\"" + path + "\");});\n");
 			stream.append("</script>\n");
 			//append js
 			
@@ -277,6 +313,7 @@ public class WidgetServer {
 		
 		return response;
 	}
+	
 	
 	private String add_link_resource(String src){
 		
@@ -300,12 +337,19 @@ public class WidgetServer {
 		return stream.toString();
 	}
 	
-	/*
-	 * Update the detail of a widget
+	/**
+	 * Update a widget
+	 * <p>
+	 * /widgets/:creatorName/:widgetName	PUT
+	 * 
+	 * @param creator_name the string of creator name
+	 * @param widget_name the string of widget name
+	 * 
+	 * @return a JSON string of the widget
+	 * 
 	 */
 	@PUT
 	@Path("{creator_name}/{widget_name}")
-	
 	public Response Update(
 			@PathParam("creator_name") String creator_name, 
 			@PathParam("widget_name") String widget_name, 

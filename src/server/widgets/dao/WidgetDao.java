@@ -11,29 +11,29 @@ import server.widgets.bean.*;
 
 /** 
  *  This is the class to access database of widgets.
- *  The operations contain create a widget, 
- *  retrieve the full information of a widget in database, 
- *  list all widgets in database,
- *  update a widget's information.
+ *  The operations contain:
+ *  create a widget, 
+ *  find a widget by name, 
+ *  list widgets in a service,
+ *  update a widget.
  *
  * @author Steven Zhang
- * @version 0.1 December 28, 2012.
+ * @version 1.0 February 24, 2013.
  */
 public class WidgetDao {
 	
-	/*
+	/**
 	 * This is the method to add a new widget into database.
 	 * 
-	 * @param creator_name	the name of user creates the widget.
-	 * @param widget_name	the name of the widget.
+	 * @param widget an instance of WidgetBean
 	 * 
+	 * @return an instance of WidgetBean with id
 	 */
 	public WidgetBean Create(WidgetBean widget) throws ClassNotFoundException, SQLException {
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-//		WidgetBean item = null;
 		
 		try{
 			
@@ -71,12 +71,7 @@ public class WidgetDao {
 			rs = pstmt.executeQuery();
 			
 			if(rs.next()){
-//				item = new WidgetBean();
 				widget.setId(rs.getInt("wid"));
-//				item.setId(rs.getInt("wid"));
-//				item.setCreator_name(rs.getString("username"));
-//				item.setWidget_name(rs.getString("widget_name"));
-//				item.setService_name(rs.getString("service_name"));
 			}
 			
 		}catch(SQLException e){
@@ -93,12 +88,12 @@ public class WidgetDao {
 		return widget;
 	}
 	
-	/*
+	/**
 	 * This is the method to retrieve full info of a widget.
 	 * 
 	 * @param creator_name	the name of user creates the widget.
 	 * @param widget_name	the name of the widget.
-	 * @return				the java bean of the widget.
+	 * @return				an instance of WidgetBean.
 	 */
 	public WidgetBean Find(String creator_name, String widget_name) throws ClassNotFoundException, SQLException{
 		
@@ -166,10 +161,11 @@ public class WidgetDao {
 		return item;
 	}
 	
-	/*
-	 * This is the method to list all widgets.
+	/**
+	 * This is the method to list widgets of a service.
 	 * 
-	 * @return				a list of java beans.
+	 * @param service the name of service, e.g. eBay, Facebook
+	 * @return	a list of WidgetBeans.
 	 */
 	public List<WidgetBean> List(String service) throws ClassNotFoundException, SQLException{
 		
@@ -208,14 +204,13 @@ public class WidgetDao {
 		return items;	
 	}
 	
-	/*
-	 * This is the method to update widget's info.
+	/**
+	 * This is the method to update widget.
 	 * 
-	 * @param creator_name	the name of user creates the widget.
-	 * @param widget_name	the name of the widget.
-	 * @return				
+	 * @param widget an instance of WidgetBean.
+	 * 				
 	 */
-	public String Update(WidgetBean widget) throws ClassNotFoundException, SQLException{
+	public void Update(WidgetBean widget) throws ClassNotFoundException, SQLException{
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -262,6 +257,6 @@ public class WidgetDao {
 			}
 		}
 		
-		return null;
+		return;
 	}
 }

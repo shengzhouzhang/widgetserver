@@ -1,11 +1,17 @@
 package server.widgets.bean;
 
+/** 
+ *  This is the class to store codes information.
+ *
+ * @author Steven Zhang
+ * @version 1.0 February 24, 2013.
+ */
 public class FileBean {
 
-	private String javascript;
-	private String html;
-	private String css;
-	private String container;
+	private String javascript;		// file of JavaScript
+	private String html;			// file of HTML
+	private String css;				// file of CSS
+	private String container;		// file of Container
 	
 	public String getJavascript() {
 		return javascript;

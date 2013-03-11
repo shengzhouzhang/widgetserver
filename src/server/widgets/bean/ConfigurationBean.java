@@ -1,28 +1,35 @@
 package server.widgets.bean;
 
+/** 
+ *  This is the class to store configuration information.
+ *
+ * @author Steven Zhang
+ * @version 1.0 February 24, 2013.
+ */
 public class ConfigurationBean {
 
-	private String html_link;
-	private String javascript_link;
-	private String css_link;
-	private String container_link;
+	private String html_link;					// the URL of HTML link
+	private String javascript_link;				// the URL of JavaScript link
+	private String css_link;					// the URL of CSS link
+	private String container_link;				// the URL of Container link
 	
-	private Boolean load_from_html_link;
-	private Boolean load_from_javascript_link;
-	private Boolean load_from_css_link;
-	private Boolean load_from_container_link;
+	private Boolean load_from_html_link;		// load from HTML link or from widgetserver
+	private Boolean load_from_javascript_link;	// load from JavaScript link or from widgetserver
+	private Boolean load_from_css_link;			// load from CSS link or from widgetserver
+	private Boolean load_from_container_link;	// load from Container link or from widgetserver
 	
 	// github configuration
-	private Boolean save_to_github;
-	private Boolean load_from_github;
-	private String owner_name;
-	private String repo_name;
-	private String html_path;
-	private String javascript_path;
-	private String css_path;
-	private String container_path;
-	private String github_account;
-	private String github_password;
+	private Boolean save_to_github;				// push to github ?
+	private Boolean load_from_github;			// pull from github or from widgetserver?
+	private String owner_name;					// repository's owner
+	private String repo_name;					// repository's name
+	private String html_path;					// path of HTML file
+	private String javascript_path;				// path of JavaScript file
+	private String css_path;					// path of CSS file
+	private String container_path;				// path of Container file
+	private String github_account;				// github account name
+	private String github_password;				// github account password
+	
 	public String getHtml_link() {
 		return html_link;
 	}

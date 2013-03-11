@@ -1,16 +1,22 @@
 package server.widgets.bean;
 
+/** 
+ *  This is the class to store widget information.
+ *
+ * @author Steven Zhang
+ * @version 1.0 February 24, 2013.
+ */
 public class WidgetBean {
 	
-	private int id;
-	private String creator_name;
-	private String widget_name;
+	private int id;								// id of widget
+	private String creator_name;				// name of widget's creator
+	private String widget_name;					// name of widget
 	
-	private FileBean files;
+	private FileBean files;						// HTML, JavaScript, CSS, and Container files
 	
-	private String service_name;
+	private String service_name;				// the name of service. e.g. eBay
 	
-	private ConfigurationBean configurations;
+	private ConfigurationBean configurations;	// configurations of widget
 
 	public WidgetBean(){
 	}
